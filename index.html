@@ -3,267 +3,593 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>マイボート運航・釣果・費用アシスタント</title>
+    <title>VoyageShare - マイボート総合アシスタント</title>
     <style>
         :root {
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-            --bg-color: #f8fafc;
+            --primary: #0b2f61;
+            --primary-light: #164e96;
+            --accent: #00d2ff;
+            --bg-color: #f0f4f8;
             --card-bg: #ffffff;
-            --text-main: #334155;
-            --border-color: #cbd5e1;
+            --text-main: #2c3e50;
+            --text-sub: #7f8c8d;
+            --border: #dcdde1;
+            --radius: 12px;
+            --go: #16a34a;
+            --caution: #ca8a04;
+            --nogo: #dc2626;
         }
-        body {
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
             padding: 16px;
-            line-height: 1.5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
+
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        h1 {
-            font-size: 1.25rem;
-            text-align: center;
-            color: var(--primary-dark);
-            margin-bottom: 20px;
-        }
-        .card {
+            width: 100%;
+            max-width: 480px;
             background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px rgba(11, 47, 97, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .card h2 {
-            font-size: 1rem;
-            margin-top: 0;
-            border-bottom: 2px solid #e2e8f0;
-            padding-bottom: 8px;
-            color: #1e293b;
+
+        /* ヘッダー */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 20px;
+            text-align: center;
         }
-        .form-group {
-            margin-bottom: 12px;
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 2px;
         }
-        label {
-            display: block;
+
+        header p {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* ナビゲーションタブ */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: #e2e8f0;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* タブコンテンツパネル */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .section-title {
             font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 4px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        input, select {
+
+        .section-title::before {
+            content: "";
+            display: inline-block;
+            width: 4px;
+            height: 12px;
+            background-color: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* グループ化 */
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .input-with-unit {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-with-unit input {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            padding: 10px 36px 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
             font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            background-color: #fafbfc;
+            outline: none;
+            transition: all 0.2s;
         }
-        button {
-            width: 100%;
+
+        .input-with-unit input:focus {
+            border-color: var(--primary-light);
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(22, 78, 150, 0.1);
+        }
+
+        .unit {
+            position: absolute;
+            right: 12px;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            pointer-events: none;
+        }
+
+        /* クイックボタン群 */
+        .quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .q-btn {
+            background-color: #f0f4f8;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 0;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+
+        .q-btn:hover {
+            background-color: #e2e8f0;
+        }
+
+        .q-btn.active {
             background-color: var(--primary);
             color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: bold;
+            border-color: var(--primary);
+        }
+
+        /* 目的地ボタン */
+        .dest-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .dest-btn {
+            background-color: #f0f4f8;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 6px;
+            text-align: center;
             cursor: pointer;
-            margin-top: 8px;
+            transition: all 0.15s;
         }
-        button:hover {
-            background-color: var(--primary-dark);
+
+        .dest-btn:hover {
+            border-color: var(--primary-light);
+            background-color: #e8f1fc;
         }
-        .result-box {
-            background: #f1f5f9;
-            border-radius: 6px;
-            padding: 12px;
-            margin-top: 12px;
-            font-size: 0.9rem;
+
+        .dest-name {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
         }
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-weight: bold;
-            font-size: 0.9rem;
+
+        .dest-dist {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* 費用結果表示カード */
+        .result-card {
+            background: linear-gradient(135deg, #0b2f61, #164e96);
             color: white;
-            margin-bottom: 8px;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: 0 6px 15px rgba(11, 47, 97, 0.2);
         }
-        .bg-go { background-color: #16a34a; }
-        .bg-caution { background-color: #ca8a04; }
-        .bg-nogo { background-color: #dc2626; }
-        .bg-unknown { background-color: #64748b; }
-        .fishing-item {
-            border-left: 4px solid var(--primary);
-            padding-left: 8px;
-            margin-bottom: 10px;
+
+        .result-header-label {
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            opacity: 0.8;
+            text-transform: uppercase;
         }
-        .fishing-item h3 {
-            margin: 0 0 4px 0;
-            font-size: 0.95rem;
+
+        .per-person-amount {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #ffffff;
         }
-        .fishing-item p {
-            margin: 0;
+
+        .per-person-amount span {
+            font-size: 1.1rem;
+            font-weight: normal;
+        }
+
+        .result-details {
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
             font-size: 0.85rem;
-            color: #64748b;
+            text-align: left;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-row.subtotal {
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-top: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-top: 6px;
+            margin-top: 2px;
+        }
+
+        .result-row span:last-child {
+            font-weight: 600;
+        }
+
+        /* 出港判断の結果カード */
+        .safety-result-card {
+            border-radius: var(--radius);
+            padding: 20px;
+            color: white;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: background 0.3s;
+        }
+        .bg-go-card { background: linear-gradient(135deg, #15803d, #22c55e); }
+        .bg-caution-card { background: linear-gradient(135deg, #a16207, #eab308); }
+        .bg-nogo-card { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+        .bg-unknown-card { background: linear-gradient(135deg, #475569, #64748b); }
+
+        .safety-status-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+        }
+
+        .safety-details {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .safety-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 釣果情報のスタイル */
+        .fishing-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+
+        .fishing-card h3 {
+            font-size: 0.95rem;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .fishing-card p {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        /* フッタークレジット */
+        footer {
+            text-align: center;
+            padding: 12px;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            background-color: #fafbfc;
+            border-top: 1px solid var(--border);
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>⚓ マイボート・アシスタント</h1>
+    <div class="container">
+        <header>
+            <h1>VoyageShare</h1>
+            <p>マイボート総合運航・精算アシスタント</p>
+        </header>
 
-    <!-- 1. 安全出港判断 -->
-    <div class="card">
-        <h2>1. 安全出港判断（湘南港・相模湾）</h2>
-        <div class="form-group">
-            <label for="tide">潮位 (cm)</label>
-            <input type="number" id="tide" placeholder="例: 68">
+        <!-- タブメニュー -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('calc')">💰 費用計算</button>
+            <button class="tab-btn" onclick="switchTab('safety')">⚓ 出港判断</button>
+            <button class="tab-btn" onclick="switchTab('fishing')">🎣 釣果情報</button>
         </div>
-        <div class="form-group">
-            <label for="wave">波高 (cm)</label>
-            <input type="number" id="wave" placeholder="例: 50">
-        </div>
-        <div class="form-group">
-            <label for="wind">風速 (m/s)</label>
-            <input type="number" id="wind" placeholder="例: 5">
-        </div>
-        <button onclick="checkSafety()">出港可否を判定する</button>
 
-        <div id="safetyResult" class="result-box" style="display:none;">
-            <div id="judgmentBadge" class="badge"></div>
-            <div id="judgmentReason"></div>
+        <!-- タブ1: 費用計算 (boatcalc) -->
+        <div id="tab-calc" class="tab-content active">
+            <div class="input-group">
+                <label for="passengers">乗船人数 (オーナー含む)</label>
+                <div class="input-with-unit">
+                    <input type="number" id="passengers" value="2" min="1" max="6" inputmode="numeric">
+                    <span class="unit">名</span>
+                </div>
+                <div class="quick-buttons" id="p-buttons">
+                    <button type="button" class="q-btn" data-val="1">1名</button>
+                    <button type="button" class="q-btn active" data-val="2">2名</button>
+                    <button type="button" class="q-btn" data-val="3">3名</button>
+                    <button type="button" class="q-btn" data-val="4">4名</button>
+                    <button type="button" class="q-btn" data-val="5">5名</button>
+                    <button type="button" class="q-btn" data-val="6">6名</button>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="distance">航行距離</label>
+                <div class="input-with-unit">
+                    <input type="number" id="distance" value="17.6" step="0.1" min="0" inputmode="decimal">
+                    <span class="unit">nm</span>
+                </div>
+                <div class="dest-grid">
+                    <div class="dest-btn" data-dist="17.6"><span class="dest-name">瀬の海</span><span class="dest-dist">17.6 nm</span></div>
+                    <div class="dest-btn" data-dist="44.0"><span class="dest-name">三浦</span><span class="dest-dist">44.0 nm</span></div>
+                    <div class="dest-btn" data-dist="48.4"><span class="dest-name">初島</span><span class="dest-dist">48.4 nm</span></div>
+                    <div class="dest-btn" data-dist="57.2"><span class="dest-name">伊東</span><span class="dest-dist">57.2 nm</span></div>
+                    <div class="dest-btn" data-dist="88.0"><span class="dest-name">大島</span><span class="dest-dist">88.0 nm</span></div>
+                    <div class="dest-btn" data-dist="110.0"><span class="dest-name">下田</span><span class="dest-dist">110.0 nm</span></div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="fuelPrice">燃料単価</label>
+                <div class="input-with-unit">
+                    <input type="number" id="fuelPrice" value="150" step="1" min="0" inputmode="numeric">
+                    <span class="unit">円/L</span>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="input-group">
+                    <label for="facilityFee">施設利用料</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="facilityFee" value="7700" step="100" min="0" inputmode="numeric">
+                        <span class="unit">円</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="mooringFee">旅先係留代</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="mooringFee" value="0" step="100" min="0" inputmode="numeric">
+                        <span class="unit">円</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="input-group">
+                    <label for="baitFee">エサ代</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="baitFee" value="0" step="100" min="0" inputmode="numeric">
+                        <span class="unit">円</span>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="iceFee">氷代</label>
+                    <div class="input-with-unit">
+                        <input type="number" id="iceFee" value="0" step="100" min="0" inputmode="numeric">
+                        <span class="unit">円</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <div>
+                    <div class="result-header-label">1人あたり徴収額 (端数切り上げ)</div>
+                    <div class="per-person-amount" id="resPerPerson">0<span> 円</span></div>
+                </div>
+                <div class="result-details">
+                    <div class="result-row"><span>燃料代</span><span id="resFuelCost">0 円</span></div>
+                    <div class="result-row"><span>施設・係留・消耗品費</span><span id="resOtherCost">0 円</span></div>
+                    <div class="result-row subtotal"><span>総経費合計</span><span id="resTotalCost">0 円</span></div>
+                </div>
+            </div>
         </div>
+
+        <!-- タブ2: 安全出港判断 (湘南港・相模湾) -->
+        <div id="tab-safety" class="tab-content">
+            <div class="input-group">
+                <label for="tideVal">湘南港 潮位</label>
+                <div class="input-with-unit">
+                    <input type="number" id="tideVal" value="68" step="1" inputmode="numeric">
+                    <span class="unit">cm</span>
+                </div>
+                <span style="font-size:0.75rem; color:var(--text-sub);">基準: 65以上◯ / 50〜64△注意 / 50未満×不可</span>
+            </div>
+
+            <div class="input-group">
+                <label for="waveVal">波高</label>
+                <div class="input-with-unit">
+                    <input type="number" id="waveVal" value="50" step="5" inputmode="numeric">
+                    <span class="unit">cm</span>
+                </div>
+                <span style="font-size:0.75rem; color:var(--text-sub);">基準: 80cm以下</span>
+            </div>
+
+            <div class="input-group">
+                <label for="windVal">風速</label>
+                <div class="input-with-unit">
+                    <input type="number" id="windVal" value="4" step="0.5" inputmode="decimal">
+                    <span class="unit">m/s</span>
+                </div>
+                <span style="font-size:0.75rem; color:var(--text-sub);">基準: 8m/s以下</span>
+            </div>
+
+            <div id="safetyCard" class="safety-result-card bg-go-card">
+                <div class="result-header-label">安全出港判断結果</div>
+                <div class="safety-status-title" id="safetyStatusText">◯ 出港可能 (Go)</div>
+                <div class="safety-details" id="safetyDetailsBox">
+                    <div class="safety-row"><span>潮位判定:</span><span id="sTideDesc">◯ 安全 (68cm)</span></div>
+                    <div class="safety-row"><span>波高判定:</span><span id="sWaveDesc">◯ クリア (50cm)</span></div>
+                    <div class="safety-row"><span>風速判定:</span><span id="sWindDesc">◯ クリア (4.0m/s)</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- タブ3: 釣果情報 -->
+        <div id="tab-fishing" class="tab-content">
+            <div class="section-title">相模湾・三浦半島 最新釣果</div>
+            
+            <div class="fishing-card">
+                <h3>🎣 イサキ（大磯・剣崎周辺）</h3>
+                <p>連日トップが100尾超えを記録するなど大爆釣が継続中。ダブル・トリプルで掛かるためお土産十分に狙えます。仕掛け：ウィリー仕掛け、コマセ釣り。</p>
+            </div>
+
+            <div class="fishing-card">
+                <h3>🎣 マアジ・アマダイ五目</h3>
+                <p>平塚・茅ヶ崎沖などで良型アジやアマダイ、カイワリが手堅く釣れています。ライトタックル（LT）五目で手軽に楽しめます。</p>
+            </div>
+
+            <div class="fishing-card">
+                <h3>🎣 スルメイカ</h3>
+                <p>西湘・深場エリアを中心に良型・大型が混じり、トップで40〜100杯超えの釣果。本格的な数釣りが楽しめます。</p>
+            </div>
+        </div>
+
+        <footer>
+            &copy; Pleasure Boat Cost & Safety Management Tool
+        </footer>
     </div>
 
-    <!-- 3. 航行費用計算 -->
-    <div class="card">
-        <h2>3. 航行費用計算（boatcalc）</h2>
-        <div class="form-group">
-            <label for="destination">目的地</label>
-            <select id="destination">
-                <option value="3000">江ノ島近郊・近場 (燃料費目安: 3,000円)</option>
-                <option value="6000">葉山・鎌倉沖 (燃料費目安: 6,000円)</option>
-                <option value="12000">初島・真鶴・遠征 (燃料費目安: 12,000円)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="people">乗船人数 (人)</label>
-            <input type="number" id="people" value="2" min="1">
-        </div>
-        <button onclick="calcCost()">費用を計算する</button>
+    <script>
+        // タブ切り替えロジック
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-        <div id="costResult" class="result-box" style="display:none;"></div>
-    </div>
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
 
-    <!-- 2. おすすめ釣果・ターゲット -->
-    <div class="card">
-        <h2>2. 最新おすすめ釣果・ターゲット</h2>
-        <div class="fishing-item">
-            <h3>🎣 イサキ（相模湾・剣崎周辺）</h3>
-            <p>連日トップ100尾超えの爆釣状態！ダブル・トリプルで掛かるためお土産十分。仕掛け：ウィリー仕掛け、コマセ釣り。</p>
-        </div>
-        <div class="fishing-item">
-            <h3>🎣 マアジ・アマダイ五目</h3>
-            <p>平塚・茅ヶ崎沖などで良型アジやアマダイ、カイワリが手堅く狙える。ライトタックル（LT）五目で楽しめます。</p>
-        </div>
-        <div class="fishing-item">
-            <h3>🎣 スルメイカ</h3>
-            <p>西湘・深場エリアを中心に群れが継続中。トップ40〜100杯超えの釣果も出ており数釣りに最適。</p>
-        </div>
-    </div>
+        // --- 1. 費用計算ロジック ---
+        const passengersInput = document.getElementById('passengers');
+        const distanceInput = document.getElementById('distance');
+        const fuelPriceInput = document.getElementById('fuelPrice');
+        const facilityFeeInput = document.getElementById('facilityFee');
+        const mooringFeeInput = document.getElementById('mooringFee');
+        const baitFeeInput = document.getElementById('baitFee');
+        const iceFeeInput = document.getElementById('iceFee');
 
-</div>
+        const resPerPerson = document.getElementById('resPerPerson');
+        const resFuelCost = document.getElementById('resFuelCost');
+        const resOtherCost = document.getElementById('resOtherCost');
+        const resTotalCost = document.getElementById('resTotalCost');
 
-<script>
-function checkSafety() {
-    const tideInput = document.getElementById('tide').value;
-    const waveInput = document.getElementById('wave').value;
-    const windInput = document.getElementById('wind').value;
-    const resultBox = document.getElementById('safetyResult');
-    const badge = document.getElementById('judgmentBadge');
-    const reason = document.getElementById('judgmentReason');
+        const pButtons = document.querySelectorAll('#p-buttons .q-btn');
+        const destButtons = document.querySelectorAll('.dest-btn');
 
-    resultBox.style.display = 'block';
+        function getVal(element) {
+            const val = parseFloat(element.value);
+            return isNaN(val) ? 0 : val;
+        }
 
-    if (tideInput === '' || waveInput === '' || windInput === '') {
-        badge.className = 'badge bg-unknown';
-        badge.textContent = '未確認';
-        reason.innerHTML = 'すべての項目（潮位・波高・風速）の数値を入力してください。';
-        return;
-    }
+        function formatYen(num) {
+            return num.toLocaleString() + ' 円';
+        }
 
-    const tide = parseFloat(tideInput);
-    const wave = parseFloat(waveInput);
-    const wind = parseFloat(windInput);
-
-    let tideStatus = '';
-    let waveOk = wave <= 80;
-    let windOk = wind <= 8;
-
-    if (tide >= 65) {
-        tideStatus = '◯ 安全（65cm以上）';
-    } else if (tide >= 50) {
-        tideStatus = '△ 注意（50〜64cm・最低限界ライン）';
-    } else {
-        tideStatus = '× 不可（50cm未満・通過不能）';
-    }
-
-    let isGo = (tide >= 50 && waveOk && windOk);
-    let isCaution = (tide >= 50 && (tide < 65 || wave > 80 || wind > 8)) || (tide >= 50 && wave <= 80 && wind <= 8); 
-    // 厳密な判定ロジック
-    let judgment = 'Go';
-    let badgeClass = 'bg-go';
-    let badgeText = '【結論】 ◯ 出港可能 (Go)';
-
-    if (tide < 50 || wave > 80 || wind > 8) {
-        judgment = 'No-Go';
-        badgeClass = 'bg-nogo';
-        badgeText = '【結論】 × 出港不可 (No-Go)';
-    } else if (tide >= 50 && tide < 65) {
-        judgment = 'Caution';
-        badgeClass = 'bg-caution';
-        badgeText = '【結論】 △ 注意出港 (Caution)';
-    }
-
-    badge.className = `badge ${badgeClass}`;
-    badge.textContent = badgeText;
-
-    reason.innerHTML = `
-        <strong>【判定内訳】</strong><br>
-        ・潮位 (${tide}cm): ${tideStatus}<br>
-        ・波高 (${wave}cm): ${waveOk ? '◯ クリア (80cm以下)' : '× 基準超過 (80cm超)'}<br>
-        ・風速 (${wind}m/s): ${windOk ? '◯ クリア (8m/s以下)' : '× 基準超過 (8m/s超)'}
-    `;
-}
-
-function calcCost() {
-    const fuelCost = parseFloat(document.getElementById('destination').value);
-    const people = parseInt(document.getElementById('people').value);
-    const costResult = document.getElementById('costResult');
-
-    costResult.style.display = 'block';
-
-    if (isNaN(people) || people <= 1) {
-        costResult.innerHTML = `<strong>【費用計算結果】</strong><br>・燃料費等合計: ¥${fuelCost.toLocaleString()}<br>・乗船人数: ${people || 1}人<br><strong>1人当たりのご負担額: ¥${fuelCost.toLocaleString()}</strong> (1人全額負担)`;
-        return;
-    }
-
-    // 複数人の場合の精算（例：燃料費を人数で割るロジック）
-    const perPerson = Math.round(fuelCost / people);
-    costResult.innerHTML = `
-        <strong>【費用計算結果】</strong><br>
-        ・燃料・オイル代等合計: ¥${fuelCost.toLocaleString()}<br>
-        ・乗船人数: ${people}人<br>
-        <strong>1人当たりの精算額: <u>¥${perPerson.toLocaleString()}</u></strong> （※端数四捨五入）
-    `;
-}
-</script>
-
-</body>
-</html>
+        function calculateCost() {
+            const passengers = Math.max(1, Math.min(6, getVal(passengersInput)));
+            const distance = getVal(distanceInput);
+            const fuelPrice = getVal(fuelPriceInput);
+            const facilityFee = getVal(facilityFeeInput);
+            const mooringFee = getVal(mooringFeeInput);
+            const baitFee = getVal(baitFeeInput);
+    
